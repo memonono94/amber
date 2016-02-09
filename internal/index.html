@@ -17,10 +17,10 @@
 
 <body>
 <script type='text/javascript'>
-    require(["amber/devel", "amber/web/Web", "helios/all", "amber_cli/AmberCli"],
+    require(["amber/devel", "amber/web/Web", "helios/all", "amber_cli/AmberCli", "codemirror/lib/codemirror"],
         function (amber) {
-            amber.popupHelios();
             amber.initialize({'transport.defaultAmdNamespace': "amber_core"});
+            amber.popupHelios();
         }
     );
 </script>
