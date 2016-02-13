@@ -1,8 +1,6 @@
 var path = require('path');
 
 module.exports = function (grunt) {
-    var helpers = require('./external/amber-dev/lib/helpers');
-
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
@@ -11,9 +9,11 @@ module.exports = function (grunt) {
     grunt.loadTasks('./internal/grunt-tasks');
     grunt.loadTasks('./external/amber-dev/tasks');
 
+    var helpers = require('./external/amber-dev').helpers;
+
     grunt.registerTask('default', ['peg', 'build:all']);
     grunt.registerTask('build:all', ['amberc:amber', 'build:cli', 'amberc:dev']);
-    grunt.registerTask('build:cli', ['amberc:cli', 'requirejs:cli']);
+    grunt.registerTask('build:cli', ['amberc:cli', 'amdconfig:amber', 'requirejs:cli']);
     grunt.registerTask('test', ['amdconfig:amber', 'requirejs:test_runner', 'execute:test_runner', 'clean:test_runner']);
     grunt.registerTask('devel', ['amdconfig:amber']);
 
@@ -45,7 +45,7 @@ module.exports = function (grunt) {
             amber: {
                 output_dir: 'src',
                 src: ['src/Kernel-Objects.st', 'src/Kernel-Classes.st', 'src/Kernel-Methods.st', 'src/Kernel-Collections.st',
-                    'src/Kernel-Infrastructure.st', 'src/Kernel-Exceptions.st', 'src/Kernel-Announcements.st',
+                    'src/Kernel-Infrastructure.st', 'src/Kernel-Promises.st', 'src/Kernel-Exceptions.st', 'src/Kernel-Announcements.st',
                     'src/Platform-Services.st', 'src/Platform-ImportExport.st', 'src/Platform-Browser.st', 'src/Platform-Node.st',
                     'src/Compiler-Exceptions.st', 'src/Compiler-Core.st', 'src/Compiler-AST.st',
                     'src/Compiler-IR.st', 'src/Compiler-Inlining.st', 'src/Compiler-Semantic.st', 'src/Compiler-Interpreter.st',
@@ -76,8 +76,9 @@ module.exports = function (grunt) {
                     rawText: {
                         "app": "(" + function () {
                             define(["amber/devel", "amber_cli/AmberCli"], function (amber) {
-                                amber.initialize();
-                                amber.globals.AmberCli._main();
+                                amber.initialize().then(function () {
+                                    amber.globals.AmberCli._main();
+                                });
                             });
                         } + "());"
                     },
@@ -97,8 +98,9 @@ module.exports = function (grunt) {
                     rawText: {
                         "app": "(" + function () {
                             define(["amber/devel", "amber_devkit/NodeTestRunner"], function (amber) {
-                                amber.initialize();
-                                amber.globals.NodeTestRunner._main();
+                                amber.initialize().then(function () {
+                                    amber.globals.NodeTestRunner._main();
+                                });
                             });
                         } + "());"
                     },

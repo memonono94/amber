@@ -1,3 +1,35 @@
+0.15.1:
+
+* Thenable class added
+* Promise class added, wraps JS Promise, subclass of Thenable
+
++ Thenable >>
+  + catch:
+  + on:do:
+  + on:do:catch:
+  + then:
+  + then:catch:
+  + then:on:do:
+  + then:on:do:catch:
++ JSObjectProxy >>
+  + catch:
+  + on:do:
+  + on:do:catch:
+  + then:
+  + then:catch:
+  + then:on:do:
+  + then:on:do:catch:
++ amber/boot api
+  + seamless
++ Promise class >>
+  + new:
+  + forBlock:
+  + value:
+  + signal:
+  + all:
+  + any:
+
+
 0.14.18:
 
 * Some internal API changes in Compiler-*.

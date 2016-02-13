@@ -8,7 +8,10 @@
     <script>
         var require = {
             baseUrl: "..",
-            map: {"*": {"amber/Platform": "amber_core/Platform-Browser"}}
+            map: {"*": {
+                "amber/Platform": "amber_core/Platform-Browser",
+                "amber/compatibility": "amber/browser-compatibility"
+            }}
         };
     </script>
     <script type='text/javascript' src='../node_modules/requirejs/require.js'></script>
@@ -16,13 +19,16 @@
 </head>
 
 <body>
+<p id="loading">Loading Amber for development ...</p>
 <script type='text/javascript'>
-    require(["amber/devel", "amber/web/Web", "helios/all", "amber_cli/AmberCli", "codemirror/lib/codemirror"],
+    require(
+        ["amber/devel", "amber/web/Web", "helios/all", "amber_cli/AmberCli", "codemirror/lib/codemirror"],
         function (amber) {
-            amber.initialize({'transport.defaultAmdNamespace': "amber_core"});
-            amber.popupHelios();
-        }
-    );
+            amber.initialize({'transport.defaultAmdNamespace': "amber_core"})
+                    .then(function () {
+                        amber.popupHelios();
+                    });
+    });
 </script>
 </body>
-</html> 
+</html>

@@ -39,7 +39,7 @@
 
 //jshint eqnull:true
 
-define(['require', './browser-compatibility'], function (require) {
+define(['require', './compatibility'], function (require) {
 
     /* Reconfigurable micro composition system, https://github.com/amber-smalltalk/brikz */
 
@@ -117,7 +117,8 @@ define(['require', './browser-compatibility'], function (require) {
         return child;
     }
 
-    var globals = {};
+    var jsGlobals = new Function("return this")();
+    var globals = Object.create(jsGlobals);
     globals.SmalltalkSettings = {};
     var api = {};
     var brikz = new Brikz(api);
@@ -485,20 +486,21 @@ define(['require', './browser-compatibility'], function (require) {
             if (!superclass || superclass == nil) {
                 superclass = null;
             }
-            if (globals[className] && globals[className].superclass == superclass) {
-                //            globals[className].superclass = superclass;
-                globals[className].iVarNames = iVarNames || [];
-                if (pkg) globals[className].pkg = pkg;
+            var theClass = globals.hasOwnProperty(className) && globals[className];
+            if (theClass && theClass.superclass == superclass) {
+                //            theClass.superclass = superclass;
+                theClass.iVarNames = iVarNames || [];
+                if (pkg) theClass.pkg = pkg;
                 if (fn) {
-                    fn.prototype = globals[className].fn.prototype;
-                    globals[className].fn = fn;
+                    fn.prototype = theClass.fn.prototype;
+                    theClass.fn = fn;
                     fn.prototype.constructor = fn;
                 }
             } else {
-                if (globals[className]) {
-                    st.removeClass(globals[className]);
+                if (theClass) {
+                    st.removeClass(theClass);
                 }
-                globals[className] = klass({
+                theClass = globals[className] = klass({
                     className: className,
                     superclass: superclass,
                     pkg: pkg,
@@ -507,11 +509,11 @@ define(['require', './browser-compatibility'], function (require) {
                     wrapped: wrapped
                 });
 
-                addSubclass(globals[className]);
+                addSubclass(theClass);
             }
 
-            classes.addElement(globals[className]);
-            org.addOrganizationElement(pkg, globals[className]);
+            classes.addElement(theClass);
+            org.addOrganizationElement(pkg, theClass);
         }
 
         st.removeClass = function (klass) {
@@ -770,6 +772,10 @@ define(['require', './browser-compatibility'], function (require) {
             st.addPackage("Kernel-Exceptions");
             st.wrapClassName("Error", "Kernel-Exceptions", Error, globals.Object);
 
+            st.addPackage("Kernel-Promises");
+            st.addClass("Thenable", globals.Object, null, "Kernel-Promises");
+            st.wrapClassName("Promise", "Kernel-Promises", Promise, globals.Thenable);
+
             /* Alias definitions */
 
             st.alias(globals.Array, "OrderedCollection");
@@ -916,6 +922,20 @@ define(['require', './browser-compatibility'], function (require) {
             } else {
                 return inContextWithErrorHandling(worker, setup);
             }
+        };
+
+        /*
+           Runs worker function so that error handler is not set up
+           if there isn't one. This is accomplished by unconditional
+           wrapping inside a context of a simulated `nil seamlessDoIt` call,
+           which then stops error handler setup (see st.withContext above).
+           The effect is, $core.seamless(fn)'s exceptions are not
+           handed into ST error handler and caller should process them.
+         */
+        st.seamless = function (worker) {
+            return inContext(worker, function (ctx) {
+                ctx.fill(nil, "seamlessDoIt", {}, globals.UndefinedObject);
+            });
         };
 
         function inContextWithErrorHandling(worker, setup) {
