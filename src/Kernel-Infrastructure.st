@@ -273,10 +273,10 @@ beDirty
 classTemplate
 	^ String streamContents: [ :stream |
 		stream
-			nextPutAll: 'Object';
-			nextPutAll: ' subclass: #NameOfSubclass';
+			nextPutAll: 'Object ';
+			nextPutAll: 'subclass: #NameOfSubclass';
 			nextPutAll: String lf, String tab;
-			nextPutAll: 'instanceVariableNames: '''''.
+			nextPutAll: 'instanceVariableNames: '''.
 		stream
 			nextPutAll: '''', String lf, String tab;
 			nextPutAll: 'package: ''';
