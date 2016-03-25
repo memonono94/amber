@@ -5,6 +5,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-execute');
+    grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-concurrent');
 
     grunt.loadTasks('./internal/grunt-tasks');
     grunt.loadTasks('./external/amber-dev/tasks');
@@ -16,12 +18,31 @@ module.exports = function (grunt) {
     grunt.registerTask('build:cli', ['amberc:cli', 'amdconfig:amber', 'requirejs:cli']);
     grunt.registerTask('test', ['amdconfig:amber', 'requirejs:test_runner', 'execute:test_runner', 'clean:test_runner']);
     grunt.registerTask('devel', ['amdconfig:amber']);
+    grunt.registerTask('amber-serve', ['concurrent:target']);
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
         meta: {
             banner: '/*!\n <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> \n License: <%= pkg.license.type %> \n*/\n'
+        },
+
+        shell: {
+            runNodeServer: {
+                command: "node ./node-server.js"
+            },
+            runAmber: {
+                command: "amber serve"
+            }
+        },
+
+        concurrent: {
+            target: {
+                tasks: ["shell:runNodeServer", "shell:runAmber"]
+            },
+            options: {
+                logConcurrentOutput: true
+            }
         },
 
         peg: {
