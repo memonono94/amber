@@ -16,19 +16,21 @@
     </script>
     <script type='text/javascript' src='../node_modules/requirejs/require.js'></script>
     <script type='text/javascript' src='../config.js'></script>
+    <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
 </head>
 
 <body>
 <p id="loading">Loading Amber for development ...</p>
 <script type='text/javascript'>
-    require(
-        ["amber/devel", "amber/web/Web", "helios/all", "amber_cli/AmberCli", "codemirror/lib/codemirror"],
-        function (amber) {
-            amber.initialize({'transport.defaultAmdNamespace': "amber_core"})
-                    .then(function () {
-                        amber.popupHelios();
-                    });
-    });
+    $.ajax({type: "GET", url: "http://localhost:3000/amber-cli-files", success: function(amber_cli_files){
+        require(["amber/devel", "amber/web/Web", "helios/all", "codemirror/lib/codemirror"].concat(amber_cli_files),
+            function (amber) {
+                amber.initialize({'transport.defaultAmdNamespace': "amber_core"})
+                        .then(function () {
+                            amber.popupHelios();
+                        });
+            });
+    }});
 </script>
 </body>
 </html>
