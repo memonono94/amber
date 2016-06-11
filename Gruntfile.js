@@ -1,4 +1,5 @@
 var path = require('path');
+var AmberServe = require('./support/amber-serve-command');
 
 module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -18,7 +19,8 @@ module.exports = function (grunt) {
     grunt.registerTask('build:cli', ['amberc:cli', 'amdconfig:amber', 'requirejs:cli']);
     grunt.registerTask('test', ['amdconfig:amber', 'requirejs:test_runner', 'execute:test_runner', 'clean:test_runner']);
     grunt.registerTask('devel', ['amdconfig:amber']);
-    grunt.registerTask('amber-serve', ['concurrent:target']);
+    grunt.registerTask('amber-serve', ['concurrent:amberLocal']);
+    grunt.registerTask('amber-serve-external', ['concurrent:amberExternal']);
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -32,14 +34,13 @@ module.exports = function (grunt) {
                 command: "node ./node-server.js"
             },
             runAmber: {
-                command: "amber serve"
+                command: AmberServe.command
             }
         },
 
         concurrent: {
-            target: {
-                tasks: ["shell:runNodeServer", "shell:runAmber"]
-            },
+            amberExternal: ["shell:runNodeServer", "shell:runAmber:external"],
+            amberLocal: ["shell:runNodeServer", "shell:runAmber"],
             options: {
                 logConcurrentOutput: true
             }
