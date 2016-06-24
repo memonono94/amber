@@ -1,3 +1,4 @@
+var IPAddress = require("./support/ip-address");
 var express = require("express");
 var fs = require("fs");
 var cors = require('cors');
@@ -15,11 +16,14 @@ router.get('/amber-cli-files', function(req, res) {
 
 app.use(router);
 
+var PORT = 3000;
+var HOST = IPAddress.currentExternalIP();
+
 if(fs.existsSync(".env", fs.F_OK)) {
     fs.unlinkSync(".env");
 }
-fs.writeFile(".env", "localhost");
+fs.writeFile(".env", HOST);
 
-app.listen(3000, function() {
-    console.log("Node server running on http://localhost:3000");
+app.listen(PORT, HOST, function() {
+    console.log("Node server running on http://" + HOST + ":" + PORT);
 });
