@@ -33,13 +33,16 @@ module.exports = function (grunt) {
             runNodeServer: {
                 command: "node ./node-server.js"
             },
+            runNodeServerExternally: {
+                command: "node ./node-server-externally.js"
+            },
             runAmber: {
                 command: AmberServe.command
             }
         },
 
         concurrent: {
-            amberExternal: ["shell:runNodeServer", "shell:runAmber:external"],
+            amberExternal: ["shell:runNodeServerExternally", "shell:runAmber:external"],
             amberLocal: ["shell:runNodeServer", "shell:runAmber"],
             options: {
                 logConcurrentOutput: true

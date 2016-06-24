@@ -18,3 +18,5 @@ bower_components/
 
 # Other generated or transient files
 /config.js
+
+.env
